@@ -495,7 +495,9 @@ This ordinal encoding preserves the progressive nature of resistance severity wh
 
 Following threshold-based exclusion, remaining missing susceptibility values are imputed using median imputation, applied independently to each antibiotic feature:
 
-𝑥̂𝑖,𝑗 = median({𝑥𝑘,𝑗 | 𝑥𝑘,𝑗 is observed}) where 𝑥̂𝑖,𝑗 is the imputed resistance value for isolate 𝑖 and antibiotic 𝑗, and 𝑥𝑘,𝑗 represents observed resistance values for antibiotic 𝑗.
+x̂(i,j) = median({x(k,j) | x(k,j) is observed})
+
+where x̂(i,j) is the imputed resistance value for isolate i and antibiotic j, and x(k,j) represents observed resistance values for antibiotic j.
 
 Median imputation is robust to outliers and preserves the ordinal nature of resistance data. Alternative strategies such as mean or mode imputation are considered; however, the median provides a conservative central estimate suitable for exploratory pattern recognition.
 
@@ -509,7 +511,7 @@ The MAR index quantifies the proportion of antibiotics to which an isolate exhib
 
 resistance:
 
-MAR = 𝑎𝑏 where 𝑎 is the number of antibiotics for which resistance is observed (encoded value = 2), and 𝑏 is the total number of antibiotics tested for the isolate.
+MAR = a/b, where *a* is the number of antibiotics for which resistance is observed (encoded value = 2), and *b* is the total number of antibiotics tested for the isolate.
 
 ### Interpretation:
 
@@ -520,7 +522,9 @@ MAR = 𝑎𝑏 where 𝑎 is the number of antibiotics for which resistance is o
 
 The breadth of resistance across antimicrobial classes was computed as:
 
-Resistant Classes = |{𝑐 | ∃𝑎 ∈ 𝑐, resistance(𝑎) = true}| where 𝑐 denotes an antimicrobial class and 𝑎 denotes an antibiotic belonging to that class.
+Resistant Classes = |{c | ∃a ∈ c, resistance(a) = true}|
+
+where c denotes an antimicrobial class and a denotes an antibiotic belonging to that class.
 
 This metric captures class-level resistance diversity rather than resistance to
 
@@ -538,8 +542,8 @@ MDR = 1 if Resistant Classes ≥ 3, otherwise 0
 
 To prevent information leakage and circular reasoning, the analysis-ready dataset is explicitly partitioned into two components:
 
-- Feature Matrix (𝑿): Encoded resistance values for the 22 antibiotics, used exclusively for unsupervised clustering and supervised validation.
-- Metadata Matrix (𝑴): Contextual variables (e.g., region, site, species, source category, MDR status), reserved solely for post-discovery interpretation.
+- Feature Matrix (X): Encoded resistance values for the 22 antibiotics, used exclusively for unsupervised clustering and supervised validation.
+- Metadata Matrix (M): Contextual variables (e.g., region, site, species, source category, MDR status), reserved solely for post-discovery interpretation.
 
 This separation ensures that resistance patterns are discovered strictly from phenotypic
 
@@ -562,7 +566,7 @@ The objective of this phase is to identify latent resistance structures based so
 
 Hierarchical Agglomerative Clustering (HAC) was selected as the primary unsupervised learning method due to the following properties:
 
-- Exploratory suitability: Unlike partition-based methods (e.g., k-means) that require a priori specification of 𝑘, HAC constructs a complete hierarchical structure first, deferring cluster number selection to post-hoc analysis using data-driven validation metrics (silhouette coefficient, WCSS elbow analysis).
+- Exploratory suitability: Unlike partition-based methods (e.g., k-means) that require a priori specification of k, HAC constructs a complete hierarchical structure first, deferring cluster number selection to post-hoc analysis using data-driven validation metrics (silhouette coefficient, WCSS elbow analysis).
 - Multi-scale structure discovery: The hierarchical representation enables examination of resistance patterns at multiple levels of granularity.
 - Interpretability: Dendrograms provide transparent visualization of cluster formation and merge decisions.
 - Minimal structural assumptions: HAC does not impose assumptions regarding
@@ -575,11 +579,9 @@ These characteristics make HAC appropriate for exploratory pattern recognition i
 
 Euclidean distance is used as the primary measure of dissimilarity between resistance profiles:
 
-𝑑(𝑥, 𝑦) = √∑𝑛
+d(x, y) = √Σ(i=1 to n)(xi - yi)²
 
-(𝑥𝑖 − 𝑦𝑖)2
-
-where 𝑥 and 𝑦 are resistance vectors for two isolates and 𝑛 is the number of antibiotics.
+where x and y are resistance vectors for two isolates and n is the number of antibiotics.
 
 This metric is selected because it preserves proportional differences introduced by ordinal resistance encoding (S = 0, I = 1, R = 2) and is compatible with variance-based linkage methods such as Ward’s criterion. Given the 22-dimensional feature space— where the number of features is substantially smaller than the sample size—Euclidean distance remains effective without dimensionality reduction.
 
@@ -587,14 +589,12 @@ This metric is selected because it preserves proportional differences introduced
 
 Ward’s minimum variance linkage method is used to guide cluster merging:
 
-Δ(𝐴, 𝐵) = 𝑛𝑛𝐴+𝑛𝐵𝑛 ‖𝑐𝐴 − 𝑐𝐵‖2
+Δ(A, B) = (nA × nB) / (nA + nB) × ||cA - cB||²
 
 where:
 
-𝐴	𝐵
-
-- 𝑛𝐴 and 𝑛𝐵 denote the sizes of clusters 𝐴 and 𝐵,
-- 𝑐𝐴 and 𝑐𝐵 represent their respective centroids.
+- nA and nB denote the sizes of clusters A and B,
+- cA and cB represent their respective centroids.
 
 Ward’s method minimizes the increase in total within-cluster variance at each merge step, producing compact and relatively balanced clusters. This property is advantageous for identifying resistance phenotypes that are internally coherent and externally separable in feature space.
 
@@ -606,22 +606,24 @@ The optimal number of clusters is determined using a data-driven, multi-criteria
 
 Cluster cohesion and separation were evaluated using the silhouette score [16]:
 
-𝑠(𝑖) = ma𝑏x(𝑖()𝑎−(𝑖)𝑎,(𝑏𝑖()𝑖))
+s(i) = (b(i) - a(i)) / max(a(i), b(i))
 
 where:
 
-- 𝑎(𝑖) is the mean intra-cluster distance for isolate 𝑖,
-- 𝑏(𝑖) is the mean distance to the nearest neighboring cluster.
+- a(i) is the mean intra-cluster distance for isolate i,
+- b(i) is the mean distance to the nearest neighboring cluster.
 
 Higher silhouette values indicate better-defined cluster structure, with scores ≥ 0.40
 
-representing moderate-to-strong structure [17]. The average silhouette score across all isolates is computed for cluster solutions ranging from 𝑘 = 2 to 𝑘 = 8, a range consistent with recommendations for systematic cluster validation [35].
+representing moderate-to-strong structure [17]. The average silhouette score across all isolates is computed for cluster solutions ranging from k = 2 to k = 8, a range consistent with recommendations for systematic cluster validation [35].
 
 ### Within-Cluster Sum of Squares (WCSS)
 
 Cluster compactness is assessed using the within-cluster sum of squares:
 
-WCSS = ∑𝐾 ∑ ‖𝑥 − 𝜇𝑘‖2 𝑘=1 𝑥∈𝐶𝑘 where 𝐶𝑘 denotes cluster 𝑘 and 𝜇𝑘 its centroid. The elbow method is used to identify diminishing returns in compactness as the number of clusters increased [36].
+WCSS = Σ(k=1 to K) Σ(x∈Ck) ||x - μk||²
+
+where Ck denotes cluster k and μk its centroid. The elbow method is used to identify diminishing returns in compactness as the number of clusters increased [36].
 
 ### Practical Constraints
 
@@ -692,17 +694,17 @@ Performance is quantified using macro-averaged metrics to prevent class imbalanc
 
 ### Macro-Averaged Precision, Recall, F1
 
-𝑐∈𝐶	𝑐	𝑐
+- Precision = (1/|C|) × Σ(c∈C) TPc / (TPc + FPc)
+- Recall = (1/|C|) × Σ(c∈C) TPc / (TPc + FNc)
+- F1 = 2 × (Precision × Recall) / (Precision + Recall)
 
-𝑐∈𝐶	𝑐	𝑐
-
-𝐹1 = 2 ×PrPecreisciiosnio+n ×ReRceacllall where 𝐶 is the set of classes and TP, FP, FN are true positives, false positives, and false negatives respectively.
+where C is the set of classes and TP, FP, FN are true positives, false positives, and false negatives respectively.
 
 ### Accuracy
 
 Overall classification correctness is measured as:
 
-Accuracy = TP + TN + TFNP + FN
+Accuracy = (TP + TN) / (TP + TN + FP + FN)
 
 ### Confusion Matrix
 
@@ -712,9 +714,9 @@ Per-class classification performance is visualized using confusion matrices to i
 
 For Random Forest models, feature importance is extracted using Gini impurity:
 
-Importance(𝑓) = ∑𝑡∈𝑇 Δ𝐺𝑡 ⋅ 𝟙[𝑓𝑡 = 𝑓 ]
+Importance(f) = Σ(t∈T) ΔGt × 𝟙[ft = f]
 
-where Δ𝐺𝑡 is the decrease in Gini impurity at node 𝑡 when feature 𝑓 is used for splitting.
+where ΔGt is the decrease in Gini impurity at node t when feature f is used for splitting.
 
 Language Discipline: Feature importance reflects associative relationships within the dataset. High importance indicates statistical association, not causal influence on resistance phenotype.
 
@@ -724,27 +726,18 @@ Model stability is validated across multiple random states to ensure that model 
 
 Algorithm 1: Cross-Seed Stability Check Algorithm
 
-1: Input: Dataset 𝐷, Prediction Model 𝑀, Random Seeds 𝑆 =
-
-{42, 123, 456, 789, 1011}
-
-2: Output: Stability metrics (𝜇metrics, 𝜎metrics) 3: 𝑅 = ∅ (Initialize results container)
-
-4: For each seed 𝑠 ∈ 𝑆 do:
-
-5:	Set global random state to 𝑠
-
-6:	Split 𝐷 into 𝐷train (80%) and 𝐷test (20%) using stratified sampling 7:	Train 𝑀 on 𝐷train
-
-8:	Evaluate 𝑀 on 𝐷test to obtain metric vector 𝑣𝑠
-
-9:	Append 𝑣𝑠 to 𝑅
-
-10: Compute mean 𝜇 = 1| 𝑆| ∑𝑣∈𝑅 𝑣
-
-11: Compute standard deviation 𝜎 = √|𝑆|1−1 ∑𝑣∈𝑅 (𝑣 − 𝜇)2
-
-12: Return 𝜇, 𝜎
+1: Input: Dataset D, Prediction Model M, Random Seeds S = {42, 123, 456, 789, 1011}
+2: Output: Stability metrics (μ_metrics, σ_metrics)
+3: R = ∅ (Initialize results container)
+4: For each seed s ∈ S do:
+5:   Set global random state to s
+6:   Split D into D_train (80%) and D_test (20%) using stratified sampling
+7:   Train M on D_train
+8:   Evaluate M on D_test to obtain metric vector vs
+9:   Append vs to R
+10: Compute mean μ = (1/|S|) × Σ(v∈R) v
+11: Compute standard deviation σ = √[(1/(|S|-1)) × Σ(v∈R) (v - μ)²]
+12: Return μ, σ
 
 Low standard deviation across seeds indicates robust model performance.
 
@@ -793,25 +786,21 @@ To characterize the relationships between resistance patterns and external varia
 
 Antibiotic co-resistance patterns are quantified using the phi coefficient (φ), calculated from binary resistance co-occurrence tables:
 
-𝜑 = √ 𝑎𝑑 − 𝑏𝑐
+φ = (ad - bc) / √[(a+b)(c+d)(a+c)(b+d)]
 
-(𝑎 + 𝑏)(𝑐 + 𝑑)(𝑎 + 𝑐)(𝑏 + 𝑑)
-
-where 𝑎, 𝑏, 𝑐, and 𝑑 represent the counts in a 2×2 contingency table of resistance presence and absence between two antibiotics.
+where a, b, c, and d represent the counts in a 2×2 contingency table of resistance presence and absence between two antibiotics.
 
 Table 13: Phi Coefficient Contingency Table Structure
 
-Antibiotic clustering based on co-resistance similarity is subsequently performed using hierarchical clustering with distance defined as 1 − 𝜑.
+Antibiotic clustering based on co-resistance similarity is subsequently performed using hierarchical clustering with distance defined as 1 - φ.
 
 #### Metadata Association Analysis
 
-Associations between resistance clusters and metadata variables are evaluated using
+Associations between resistance clusters and metadata variables are evaluated using Cramér's V, computed as:
 
-Cramér’s V, computed as:
+V = √[χ² / (n × min(r-1, c-1))]
 
-2
-
-𝑛 ⋅ min(𝑟 − 1, 𝑐 − 1) where 𝜒2 is the chi-square statistic, 𝑛 is the sample size, and 𝑟 and 𝑐 are the dimensions of the contingency table.
+where χ² is the chi-square statistic, n is the sample size, and r and c are the dimensions of the contingency table.
 
 Table 14: Cramér’s V Interpretation Guidelines [1]
 
@@ -1074,10 +1063,8 @@ expectations.
 
 ### Key Operations:
 
-- Chi-Square Test: Tests the null hypothesis that resistance to antibiotic A is independent of resistance to antibiotic B; applies Bonferroni correction to adjust significance threshold for multiple comparisons (𝛼 / 𝑛 tests)
-- Phi Coefficient: Calculates effect size for 2×2 contingency tables using the formula
-
-𝜑 = √(𝑎+𝑏)(𝑐𝑎+𝑑𝑑−)𝑏(𝑎𝑐+𝑐)(𝑏+𝑑) , where values range from −1 (perfect negative association) to +1 (perfect positive association)
+- Chi-Square Test: Tests the null hypothesis that resistance to antibiotic A is independent of resistance to antibiotic B; applies Bonferroni correction to adjust significance threshold for multiple comparisons (α / n tests)
+- Phi Coefficient: Calculates effect size for 2×2 contingency tables using the formula φ = (ad - bc) / √[(a+b)(c+d)(a+c)(b+d)], where values range from −1 (perfect negative association) to +1 (perfect positive association)
 
 - P-value Matrix: Compiles significance values for all pairwise tests into a symmetric matrix for visualization and filtering
 
@@ -1091,7 +1078,7 @@ tance relationships.
 
 - Calculate Association Strength: Combines statistical significance (p-value) with effect size (phi coefficient) to rank associations
 - Rank Co-resistance Patterns: Orders antibiotic pairs by association strength to prioritize the most important relationships
-- Identify Significant Pairs: Filters pairs meeting both significance threshold (Bonferroni-corrected 𝛼 < 0.05) and minimum effect size (𝜑 ≥ 0.2) criteria
+- Identify Significant Pairs: Filters pairs meeting both significance threshold (Bonferroni-corrected α < 0.05) and minimum effect size (φ ≥ 0.2) criteria
 
 ### Output Visual Representation
 
@@ -1182,7 +1169,7 @@ Experiment k=5: The 5-cluster solution (Davie-Bouldin = 0.976) was generated and
 
 Experiment k=6: The 6-cluster solution (Calinski-Harabasz = 214.74) yielded
 
-the highest density score but introduced singleton clusters with 𝑛 < 10 isolates. This violated the minimum cluster size requirement (𝑛𝑔 = 20) established for statistical reliability, rendering the solution less robust for subsequent analysis.
+the highest density score but introduced singleton clusters with n < 10 isolates. This violated the minimum cluster size requirement (ng = 20) established for statistical reliability, rendering the solution less robust for subsequent analysis.
 
 Consequently, k=4 was retained as the most parsimonious solution that balances
 
