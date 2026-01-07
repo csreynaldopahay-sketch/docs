@@ -532,7 +532,7 @@ An isolate is classified as multidrug-resistant (MDR) if resistance is observed 
 
 or more antimicrobial classes, consistent with established definitions [23]:
 
-MDR = {10, iofthReerswisitsaent Classes ≥ 3
+MDR = 1 if Resistant Classes ≥ 3, otherwise 0
 
 #### Feature–Metadata Separation
 
