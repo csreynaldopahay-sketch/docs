@@ -188,7 +188,7 @@ The clustering methods employed in this study implicitly capture co-resistance t
 
 The Multiple Antibiotic Resistance (MAR) index provides a scalar summary of resistance burden, calculated as the ratio of resistant antibiotics to total antibiotics tested [22]:
 
-MAR = 𝑎𝑏 where 𝑎 represents the number of antibiotics to which the isolate is resistant and 𝑏 represents the total number of antibiotics tested. Krumperman’s original formulation established a threshold of 0.2, above which isolates likely originate from environments with significant antibiotic selection pressure. Clusters characterized by high mean MAR likely represent multidrug resistance (MDR) phenotypes with clinical relevance, providing external validation independent of the clustering algorithm.
+MAR = a/b, where *a* represents the number of antibiotics to which the isolate is resistant and *b* represents the total number of antibiotics tested. Krumperman’s original formulation established a threshold of 0.2, above which isolates likely originate from environments with significant antibiotic selection pressure. Clusters characterized by high mean MAR likely represent multidrug resistance (MDR) phenotypes with clinical relevance, providing external validation independent of the clustering algorithm.
 
 #### Multidrug Resistance Classification
 
@@ -932,7 +932,7 @@ The Feature Engineering sub-stage derives clinically meaningful indicators from 
 ### Key Operations:
 
 - Select Encoded Antibiotic Columns: Identifies all _encoded columns to form the resistance fingerprint vector
-- Calculate MAR Index: Computes the Multiple Antibiotic Resistance Index using the formula MAR = 𝑎𝑏 , where a = number of antibiotics to which the isolate is resistant, and b = total antibiotics tested [22]
+- Calculate MAR Index: Computes the Multiple Antibiotic Resistance Index using the formula MAR = a/b, where a = number of antibiotics to which the isolate is resistant, and b = total antibiotics tested [22]
 - Determine MDR Status: Classifies isolates as Multi-Drug Resistant (MDR) if resistant to at least one agent in ≥3 antimicrobial categories [23]
 - Create Feature Matrix: Assembles the final feature matrix (X) containing encoded resistance values for all tested antibiotics
 
